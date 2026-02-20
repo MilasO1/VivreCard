@@ -13,6 +13,7 @@ const poolOptions: PoolOptions = {
 
 const pool: Pool = mysql.createPool(poolOptions);
 
+// Test function
 export const testConnection = async () => {
     try {
         const connection = await pool.getConnection();

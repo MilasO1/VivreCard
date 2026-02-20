@@ -1,8 +1,13 @@
 import app from "./app";
+import { testConnection } from "./src/config/database";
 
-const PORT: number = Number.parseInt(process.env.PORT || "3000");
+const PORT = process.env.PORT || 3000;
 
-// Lancement du serveur
-app.listen(PORT, () => {
-    console.log(`Serveur lancé sur ${process.env.BACKEND_URL}`);
-});
+const startServer = async () => {
+    await testConnection(); // On vérifie la DB avant de lancer
+    app.listen(PORT, () => {
+        console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
+    });
+};
+
+startServer();

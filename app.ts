@@ -1,6 +1,6 @@
 import cors from "cors";
 import helmet from "helmet";
-import rateLimit from "express-rate-limiter";
+import rateLimit from "express-rate-limit";
 import express, { urlencoded, type Application } from "express";
 
 const app: Application = express();
