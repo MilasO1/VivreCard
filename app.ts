@@ -1,31 +1,40 @@
+import express, { urlencoded, type Application } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-import express, { urlencoded, type Application } from "express";
 
 const app: Application = express();
 
-app.use(express.json());
-app.use(urlencoded({ extended: true }));
-
-// Cors
-const corsOptions = {
-    origin: process.env.CLIENT_URL, // adresse du frontend
-    credentials: true,
-};
-app.use(cors(corsOptions));
-
-// Helmet
+// 1. Sécurité HTTP (Headers)
 app.use(helmet());
 
-// Rate limit (max 100 requêtes toutes les 15 minutes)
+// 2. Limiteur de requêtes (Anti-DoS)
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limite chaque IP à 100 requêtes
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true, // Retourne les infos de limite dans les headers Ratelimit-*
+    legacyHeaders: false, // Désactive les headers X-RateLimit-*
     message: "Trop de requêtes, réessayez plus tard.",
 });
 app.use(limiter);
 
-app.use("/uploads/images", express.static("uploads/images"));
+// 3. Configuration CORS
+const corsOptions = {
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    credentials: true,
+};
+app.use(cors(corsOptions));
+
+// 4. Parsing (Analyse du corps des requêtes)
+app.use(express.json());
+app.use(urlencoded({ extended: true }));
+
+// 5. Fichiers statiques
+app.use("/uploads", express.static("uploads"));
+
+// 6. Route de test (Health check)
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok" });
+});
 
 export default app;
